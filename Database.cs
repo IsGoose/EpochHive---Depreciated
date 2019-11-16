@@ -63,7 +63,11 @@ namespace EpochHive
             result.Success = false;
             return result;
         }
-
+        /// <summary>
+        /// GEt Players' Characters - MultiChar Support
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
         public static HiveResult FetchPlayerCharacters(string uid)
         {
             HiveResult res = new HiveResult();
@@ -109,6 +113,140 @@ namespace EpochHive
             }
             res.Result = string.Join(",", chars);
             res.Success = true;
+            return res;
+        }
+
+        public static HiveResult MaintainVehicles(string playerUID)
+        {
+            return ExecuteNoReturn($"update garage set DateMaintained = CURRENT_TIMESTAMP where PlayerUID = \"{playerUID}\";");
+        }
+
+        /// <summary>
+        /// Store Vehicle in Virtual Garage
+        /// </summary>
+        /// <param name="playerUID"></param>
+        /// <param name="name"></param>
+        /// <param name="dName"></param>
+        /// <param name="classname"></param>
+        /// <param name="charID"></param>
+        /// <param name="inv"></param>
+        /// <param name="array"></param>
+        /// <param name="fuel"></param>
+        /// <param name="damage"></param>
+        /// <param name="colour"></param>
+        /// <param name="colour2"></param>
+        /// <param name="vg_serverKey"></param>
+        /// <param name="VGObjID"></param>
+        /// <param name="invCount"></param>
+        /// <returns></returns>
+        public static HiveResult StoreVehicle(string playerUID, string name, string dName, string classname,string charID, string inv, string array, string fuel, string damage, string colour, string colour2, string vg_serverKey, string  VGObjID, string invCount)
+        {
+            var date = DateTime.Now;
+            return ExecuteNoReturn($"insert into `garage` (`PlayerUID`, `Name`, `DisplayName`, `Classname`, `Datestamp`, `DateStored`, `DateMaintained`, `CharacterID`, StorageCounts, `Inventory`, `Hitpoints`, `Fuel`, `Damage`, `Colour`, `Colour2`, `serverKey`, `ObjUID`)  values ('{playerUID}','{name}','{dName}','{classname}',CURRENT_TIMESTAMP,'{date.Day}-{date.Month}-{date.Year}',CURRENT_TIMESTAMP,'{charID}','{invCount}','{inv}','{array}','{fuel}','{damage}','{colour}','{colour2}','{vg_serverKey}','{VGObjID}');");
+        }
+
+        /// <summary>
+        /// Returns vehicle data ready to spawn, creates DB entry in object_data, deletes from VG
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="_worldspace"></param>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static HiveResult GetVehicleForSpawn(string id, string worldspace, string uid)
+        {
+            var res = new HiveResult();
+            var reader = ExecuteBasicRead($"SELECT classname, CharacterID, Inventory, Hitpoints, Fuel, Damage, Colour, Colour2, serverKey, ObjUID FROM garage WHERE ID='{id}';");
+            var vehdata = new List<string>();
+            if (reader.Read())
+            {
+                string classname = reader["classname"].ToString();
+                string charid = reader["CharacterID"].ToString();
+                string inv = reader["Inventory"].ToString();
+                string hitpoints = reader["Hitpoints"].ToString();
+                string fuel = reader["Fuel"].ToString();
+                string damage = reader["Damage"].ToString();
+                string color = reader["Colour"].ToString();
+                string colour2 = reader["Colour2"].ToString();
+                string serverKey = reader["serverKey"].ToString();
+                string objectUID = reader["ObjUID"].ToString();
+                reader.Close();
+                var pubresult = Database.PublishObject(objectUID,classname,damage,charid,worldspace, inv, hitpoints,fuel);
+                if(pubresult.Success == false)
+                {
+                    res.Success = false;
+                    res.Exception = "Failed to create object when removing from VG, DB will not delete the requested vehicle as it will not spawn anyways";
+                    return res;
+                }
+                Database.DeleteVGVehicle(id);
+                vehdata.AddRange(new string[]
+                {
+                    "\"" + classname + "\"",
+                    "\"" + charid + "\"",
+                    inv,
+                    hitpoints,
+                    fuel,
+                    damage,
+                    "\"" + color + "\"",
+                    "\"" + colour2 + "\"",
+                    "\"" + serverKey + "\"",
+                    "\"" + objectUID + "\""
+                });
+                string vehStr = "[" + string.Join(",",vehdata) + "]";
+                res.Result = vehStr;
+                res.Success = true;
+                return res;
+            } else
+            {
+                res.Success = false;
+                res.Exception = $"No VG Vehicle found for ID: {id} (UID: {uid})";
+                return res;
+            }
+        }
+
+        public static HiveResult DeleteVGVehicle(string id)
+        {
+            return ExecuteNoReturn($"delete from garage where ID = {id};");
+        }
+
+        /// <summary>
+        /// Get a Players VG Vehicles
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static HiveResult GetPlayerVehicles(string uid,string sortCol)
+        {
+            var res = new HiveResult();
+            string sortColumn = "DisplayName";
+            switch (sortCol)
+            {
+                case "1": sortColumn = "DateStored"; break;
+                case "2": sortColumn = "id"; break;
+                case "3": sortColumn = "Name"; break;
+                case "4": sortColumn = "DateMaintained"; break;
+            }
+            List<string> vehs = new List<string>();
+            var reader = ExecuteBasicRead($"select * from garage where PlayerUID = \"{uid}\" order by `{sortColumn}`;");
+            if (!reader.HasRows)
+            {
+                res.Success = true;
+                res.Result = "[]";
+                return res;
+            }
+            while (reader.Read())
+            {
+                var veh = new List<string>();
+                veh.Add("\"" + reader["id"].ToString() + "\"");
+                veh.Add("\"" + reader["classname"].ToString() + "\"");
+                veh.Add(reader["StorageCounts"].ToString());
+                veh.Add("\"" + reader["CharacterID"].ToString() + "\"");
+                veh.Add("\"" + reader["DateStored"].ToString() + "\"");
+                veh.Add("\"" + reader["DateMaintained"].ToString() + "\"");
+                string vehStr = "[" + string.Join(",", veh) + "]";
+                vehs.Add(vehStr);
+            }
+            string vehsStr = "[" + string.Join(",",vehs) + "]";
+            res.Success = true;
+            res.Result = vehsStr;
             return res;
         }
 
@@ -492,7 +630,7 @@ namespace EpochHive
         public static HiveResult PublishObject(string id, string classname, string damage, string charid, string worldspace, string inventory, string hitpoints, string fuel)
         {
             return ExecuteNoReturn("insert into object_data (`ObjectUID`, `Instance`, `Classname`, `Damage`, `CharacterID`, `Worldspace`, `Inventory`, `Hitpoints`, `Fuel`, `Datestamp`) VALUES" +
-                $"(\"{id}\",11,\"{classname}\",{damage},'{charid}','{worldspace}','{inventory}','{hitpoints}\',{fuel},CURRENT_TIMESTAMP);"
+                $"(\"{id}\",11,\"{classname}\",{damage},'{charid}','{worldspace}','{inventory}','{hitpoints}',{fuel},CURRENT_TIMESTAMP);"
                 );
 
         }
