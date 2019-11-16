@@ -24,7 +24,7 @@ namespace EpochHive
                 log.Add("\t " + s);
             log.Add("");
 
-            File.AppendAllLines(AppDomain.CurrentDomain.BaseDirectory + "log.txt", log);
+            File.AppendAllLines(AppDomain.CurrentDomain.BaseDirectory + "EpochHiveLOG.txt", log);
 
         }
     }

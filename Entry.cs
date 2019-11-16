@@ -22,7 +22,7 @@ namespace EpochHive
             output.Append(result.Result);
             }catch(Exception e)
             {
-                File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", e.Message);
+                //File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", e.Message);
             }
         }
         public static HiveResult RunHive(string[] p)
