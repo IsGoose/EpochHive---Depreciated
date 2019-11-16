@@ -16,7 +16,8 @@ namespace EpochHive
             switch (child)
             {
                 //Object Calls
-                case "302": break; // Object Stream
+                case "300": result = Database.DeleteObjectFile(args[1]); break; // Object Stream
+                case "302": result = Database.ObjectStream(args[1]); break; // Object Stream
                 case "303": result = Database.UpdateObjectInventory(args[1], args[2], false);  break; //updateObjectInventory
                 case "304": result = Database.DeleteObject(args[1], false); break; //deleteObject - server_deleteObj.sqf/server_deleteObjDirect.sqf/server_publishVehicle3.sqf
                 case "305": result = Database.UpdateVehiclePosition(args[1], args[2], args[3]);break;//updateVehicleMovement

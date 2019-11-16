@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace EpochHive
@@ -26,6 +27,48 @@ namespace EpochHive
             }
             reader.Close();
             return true;
+        }
+
+        public static HiveResult DeleteObjectFile(string fn)
+        {
+            fn = fn.Replace("\"", "");
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + fn))
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + fn);
+            return new HiveResult() { Success = true };
+        }
+
+        public static HiveResult ObjectStream(string instance)
+        {
+            var res = new HiveResult();
+            var now = DateTime.Now;
+            string randName = $"objectfile{(now.Year % 3) * 12}{(now.Day + now.Second) * 3}{(now.Month % 3) * now.Millisecond}.sqf";
+            string data = "";
+            var reader = ExecuteBasicRead($"select ObjectID,Classname,CharacterID,Worldspace,Inventory,Hitpoints,Fuel,Damage,StorageCoins from Object_DATA where Instance = {instance};");
+            data += "[";
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    if (data != "[")
+                        data += ",";
+                    data += "[";
+                    data += $"\"{reader[0].ToString()}\",";
+                    data += $"\"{reader[1].ToString()}\",";
+                    data += $"\"{reader[2].ToString()}\",";
+                    data += $"{reader[3].ToString()},";
+                    data += $"{reader[4].ToString()},";
+                    data += $"{reader[5].ToString()},";
+                    data += $"{reader[6].ToString()},";
+                    data += $"{reader[7].ToString()},";
+                    data += $"{reader[8].ToString()}]";
+                }
+            }
+            data += "]";
+            reader.Close();
+            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + randName, data);
+            res.Success = true;
+            res.Result = "\"" + randName + "\"";
+            return res;
         }
 
 
