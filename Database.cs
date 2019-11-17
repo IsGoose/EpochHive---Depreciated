@@ -580,9 +580,9 @@ namespace EpochHive
         /// </summary>
         /// <param name="uid"></param>
         /// <param name="globalcoins"></param>
-        public static HiveResult UpdateGlobalCoins(string uid, string globalcoins)
+        public static HiveResult UpdateGlobalCoins(string uid,string instance, string bankcoins, string globalcoins)
         {
-            return ExecuteNoReturn($"update Player_DATA set BankCoins = '{globalcoins}' where PlayerUID = '{uid}';");
+            return ExecuteNoReturn($"update Player_DATA set BankCoins = '{bankcoins}' PlayerCoins = '{globalcoins}' where PlayerUID = '{uid}' AND Instance='{instance}';");
         }
         /// <summary>
         /// Initalise Character
@@ -636,7 +636,7 @@ namespace EpochHive
             return ExecuteNoReturn("update Character_DATA set " +
                 $"Worldspace = '{ws}',Inventory = '{gear}',Backpack = '{backpack}',Medical = '{medical}',KillsZ = '{kills}'," +
                 $"HeadshotsZ = '{hs}',DistanceFoot = '{distancefoot}',Duration = '{timesince}',CurrentState = '{currentstate}'," +
-                $"KillsH = '{killsH}',KillsB = '{killsB}',Model = '{model}',Humanity = '{humanity}',Coins = '{coins}' " +
+                $"KillsH = '{killsH}',KillsB = '{killsB}',Model = '{model}',Humanity = '{humanity}',Coins = '{(coins == (-1).ToString() ? 0.ToString() : coins)}' " +
                 $"where CharacterID = '{cid}';"
                 );
         }

@@ -39,7 +39,7 @@ namespace EpochHive
                 case "201": result = Database.UpdateCharacter(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]); break; //playerUpdate(HiveExtApp.cpp) followed by updateCharacter (SqlCharDataSource) - server_playerSync.sqf
                 case "202": result = Database.KillCharacter(args[1], args[2], args[3]); break; //killCharacter - server_playerDied.sqf
                 case "203": result = Database.InitCharacter(args[1], args[2], args[3]); break; //initCharacter - server_playerLogin.sqf
-                case "205": result = Database.UpdateGlobalCoins(args[1], args[2]); break; //Unknown Code - server_playerSync.sqf "Updates Global Coins"
+                case "205": result = Database.UpdateGlobalCoins(args[1], args[2],args[3],args[4]); break; //Unknown Code - server_playerSync.sqf "Updates Global Coins"
 
                 //Virtual Garage Calls
                 case "800": result = Database.GetPlayerVehicles(args[1],args[2]); break;
