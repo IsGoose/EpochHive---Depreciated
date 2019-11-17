@@ -562,7 +562,7 @@ namespace EpochHive
                 if (reader.Read())
                 {
                     result.Success = true;
-                    result.Result = reader["ObjectID"].ToString();
+                    result.Result = "\"" + reader["ObjectID"].ToString() + "\"";
                     return result;
                 }
                 result.Exception = "Unable to get ObjectID from ObjectUID";
