@@ -10,6 +10,7 @@ namespace EpochHive
     {
         public static string ConnectionString { get; set; }
         public static MySqlConnection Connection { get; set; }
+        public static Config Cfg { get; set; }
 
 
         /// <summary>
@@ -213,7 +214,7 @@ namespace EpochHive
                 string serverKey = reader["serverKey"].ToString();
                 string objectUID = reader["ObjUID"].ToString();
                 reader.Close();
-                var pubresult = Database.PublishObject(objectUID,classname,damage,charid,worldspace, inv, hitpoints,fuel);
+                var pubresult = Database.PublishObject(Cfg.Instance.ToString(),classname,damage,charid,worldspace,inv,hitpoints,fuel,uid);
                 if(pubresult.Success == false)
                 {
                     res.Success = false;
@@ -382,7 +383,7 @@ namespace EpochHive
                     reader.Close();
                 string medical = "[]";
                 ExecuteNoReturn("INSERT INTO `Character_DATA` (`PlayerUID`, `InstanceID`, `Worldspace`, `Inventory`, `Backpack`, `Medical`, `Generation`, `Datestamp`, `LastLogin`, `LastAte`, `LastDrank`, `Humanity`) values " +
-                $"('{uid}','11', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
+                $"('{uid}','{Cfg.Instance}', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
                 reader = ExecuteBasicRead($"select CharacterID from Character_DATA where PlayerUID = \"{uid}\" and Alive = '1';");
                 if (reader.HasRows && reader.Read())
                 {
@@ -508,7 +509,7 @@ namespace EpochHive
                     reader.Close();
                 string medical = "[]";
                 ExecuteNoReturn("INSERT INTO `Character_DATA` (`PlayerUID`, `InstanceID`, `Worldspace`, `Inventory`, `Backpack`, `Medical`, `Generation`, `Datestamp`, `LastLogin`, `LastAte`, `LastDrank`, `Humanity`) values " +
-                $"('{uid}','11', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
+                $"('{uid}','{Cfg.Instance}', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
                 reader = ExecuteBasicRead($"select CharacterID from Character_DATA where PlayerUID = \"{uid}\" and Alive = '1';");
                 if (reader.HasRows && reader.Read())
                 {
@@ -670,10 +671,10 @@ namespace EpochHive
         /// <param name="inventory"></param>
         /// <param name="hitpoints"></param>
         /// <param name="fuel"></param>
-        public static HiveResult PublishObject(string id, string classname, string damage, string charid, string worldspace, string inventory, string hitpoints, string fuel)
+        public static HiveResult PublishObject(string instance, string classname, string damage, string charid, string worldspace, string inventory, string hitpoints, string fuel,string uid)
         {
             return ExecuteNoReturn("insert into object_data (`ObjectUID`, `Instance`, `Classname`, `Damage`, `CharacterID`, `Worldspace`, `Inventory`, `Hitpoints`, `Fuel`, `Datestamp`) VALUES" +
-                $"(\"{id}\",11,\"{classname}\",{damage},'{charid}','{worldspace}','{inventory}','{hitpoints}',{fuel},CURRENT_TIMESTAMP);"
+                $"(\"{uid}\",'{instance}',\"{classname}\",{damage},'{charid}','{worldspace}','{inventory}','{hitpoints}',{fuel},CURRENT_TIMESTAMP);"
                 );
 
         }
@@ -782,6 +783,7 @@ namespace EpochHive
                 if (Connection.Ping())
                 {
                     ConnectionString = conn;
+                    Cfg = cfg;
                     result.Success = true;
                     return result;
                 }

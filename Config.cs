@@ -18,6 +18,7 @@ namespace EpochHive
         public string LogLevel { get; set; }
         public string Time { get; set; }
         public int Hour { get; set; }
+        public int Instance { get; set; }
         public Config()
         {
 
