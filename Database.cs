@@ -734,7 +734,7 @@ namespace EpochHive
             Date += Now.Year.ToString() + ",";
             Date += Now.Month.ToString() + ",";
             Date += Now.Day.ToString() + ",";
-            Date += Entry.Config.Time.ToLower() == "static" ? Entry.Config.Hour.ToString() :  Now.Hour.ToString() + ",";
+            Date += (Entry.Config.Time.ToLower() == "static" ? Entry.Config.Hour.ToString() :  Now.Hour.ToString()) + ",";
             Date += Now.Minute.ToString() + "]";
             result.Result = Date;
             return result;
