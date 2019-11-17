@@ -26,6 +26,7 @@ Add the following JSON text to the file:
 	"User": "root",
 	"Password": "",
 	"Schema": "dayz_epoch",
+	"Instance": 11,
 	"Time": "local",
 	"Hour": 11,
 	"LogLevel": "debug"
@@ -37,6 +38,7 @@ This is EpochHive's Config File - the file that EpochHive will read from when it
 - User: Database User for EpochHive to connect with
 - Password: Password of Database User
 - Schema: Database Schema to read/write data (dayz_epoch is the default schema for epoch)
+- Instance: InstanceID for you Server (11 is for Chernarus)
 - Time: Time Setting. "local" for Local Server System Time, "static" for Static Time as defined below
 - Hour: Hour to return if Time is set to "static" - not used if Time is set to "local"
 - LogLevel: If "debug", then EpochHive will log every action. if left emtpy ("")  EpochHive will only log Critical Errors
