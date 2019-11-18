@@ -33,9 +33,16 @@ namespace EpochHive
         public static HiveResult DeleteObjectFile(string fn)
         {
             fn = fn.Replace("\"", "");
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + fn))
-                File.Delete(AppDomain.CurrentDomain.BaseDirectory + fn);
-            return new HiveResult() { Success = true };
+            if (fn.ToLower().StartsWith("objectfile") && fn.ToLower().EndsWith(".sqf"))
+            {
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + fn))
+                {
+                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + fn);
+                    return new HiveResult() { Success = true };
+                }
+            }
+            return new HiveResult() { Success = false, Exception = $"Could not delete requested file as suspected not to be an objectfile ({fn})" };
+
         }
 
         public static HiveResult ObjectStream(string instance)
