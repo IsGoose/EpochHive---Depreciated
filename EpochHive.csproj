@@ -80,6 +80,15 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="PreBuilt\hiveCfg.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PreBuilt\BouncyCastle.Crypto.dll" />
+    <Content Include="PreBuilt\EpochHive.dll" />
+    <Content Include="PreBuilt\Google.Protobuf.dll" />
+    <Content Include="PreBuilt\MySql.Data.dll" />
+    <Content Include="PreBuilt\Newtonsoft.Json.dll" />
+    <Content Include="PreBuilt\Renci.SshNet.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets" Condition="Exists('packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets')" />

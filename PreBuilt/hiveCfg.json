@@ -1,0 +1,10 @@
+{
+	"Host": "localhost",
+	"Password": "",
+	"Schema": "dayz_epoch",
+	"User": "root",
+	"Instance": 11,
+	"Time": "static",
+	"Hour": 11,
+	"LogLevel": "debug"
+}
