@@ -44,6 +44,7 @@ namespace EpochHive
             var now = DateTime.Now;
             string randName = $"objectfile{(now.Year % 3) * 12}{(now.Day + now.Second) * 3}{(now.Month % 3) * now.Millisecond}.sqf";
             string data = "";
+            ExecuteNoReturn("delete from object_data where Damage = 1;");
             var reader = ExecuteBasicRead($"select ObjectID,Classname,CharacterID,Worldspace,Inventory,Hitpoints,Fuel,Damage,StorageCoins from Object_DATA where Instance = {instance};");
             data += "[";
             if (reader.HasRows)
@@ -484,7 +485,7 @@ namespace EpochHive
                 survival[1] = reader[5].ToString();
                 survival[2] = reader[6].ToString();
                 survival[3] = reader[8].ToString();
-                model = reader[7].ToString();
+                model = "\"" + reader[7].ToString() + "\"";
                 characterCoins = reader[9].ToString();
                 reader.Close();
                 ExecuteNoReturn($"update Character_DATA set LastLogin = CURRENT_TIMESTAMP where CharacterID = \"{charid}\";");

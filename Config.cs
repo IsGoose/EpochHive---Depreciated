@@ -50,7 +50,7 @@ namespace EpochHive
             }
             catch (Exception e)
             {
-                //File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", e.Message);
+               // File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", e.Message);
             }
             return null;
         }

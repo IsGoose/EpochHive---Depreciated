@@ -15,14 +15,15 @@ namespace EpochHive
         [DllExport("_RVExtension@12", CallingConvention = System.Runtime.InteropServices.CallingConvention.Winapi)]
         public static void RVExtension(StringBuilder output, int outputSize, [MarshalAs(UnmanagedType.LPStr)] string function)
         {
+            string[] sqfParams = function.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
             try { 
             outputSize--;
-            string[] sqfParams = function.Split(new char[] { ':' },StringSplitOptions.RemoveEmptyEntries);
+            
             var result = RunHive(sqfParams);
             output.Append(result.Result);
             }catch(Exception e)
             {
-                //File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", e.Message);
+              //  File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", $"{e.Message}\n[{string.Join(",",sqfParams)}]");
             }
         }
         public static HiveResult RunHive(string[] p)

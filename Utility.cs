@@ -21,7 +21,7 @@ namespace EpochHive
                 case "303": result = Database.UpdateObjectInventory(args[1], args[2], false);  break; //updateObjectInventory
                 case "304": result = Database.DeleteObject(args[1], false); break; //deleteObject - server_deleteObj.sqf/server_deleteObjDirect.sqf/server_publishVehicle3.sqf
                 case "305": result = Database.UpdateVehiclePosition(args[1], args[2], args[3]);break;//updateVehicleMovement
-                case "306": result = Database.UpdateVehicleStatus(args[1], args[2], args[3], String2Bool(args[4])); break; //updateVehicleStatus 
+                case "306": result = Database.UpdateVehicleStatus(args[1], args[2], args[3],false); break; //updateVehicleStatus 
                 case "307": result = Database.ReturnDateTime(); break; //getDateTime (HiveExtApp.cpp) - server_monitor.sqf
                 case "308": result = Database.PublishObject(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8],args[9]); break; //createObject -server_publishObject.sqf/server_publishVehicle.sqf/server_publishVehicle2.sqf/server_publishVehicle3.sqf/server_swapObject.sqf
                 case "309": result = Database.UpdateObjectInventory(args[1], args[2], true); break; //updateObjectInventory
@@ -48,13 +48,6 @@ namespace EpochHive
                 case "803": result = Database.MaintainVehicles(args[1]); break;
             }
             return result;
-        }
-
-        public static bool String2Bool(string val)
-        {
-            if (val.ToUpper() == "TRUE")
-                return true;
-            return false;
         }
 
     }
