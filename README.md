@@ -19,8 +19,8 @@ Epoch Hive was built upon the .NET Framework (ver. 4.7.2)
 *Epoch Hive Should only be used with DayZ Epoch*  
 
 ### Using prebuilt EpochHive
-Copy: EpochHive.dll,MySql.Data.dll,Newtonsoft.Json.dll,BouncyCastle.Crypto.dll,Google.Protobuf.dll,Renci.SshNet.dll 
-To your root Server Install Directory
+Copy: EpochHive.dll,MySql.Data.dll,Newtonsoft.Json.dll,BouncyCastle.Crypto.dll,Google.Protobuf.dll,Renci.SshNet.dll  
+To your root Server Install Directory  
 Copy the hiveCfg.json file to your Server Config Directory and edit the config file to suit your needs and Database Login
 
 
