@@ -60,9 +60,11 @@ A custom method will have these 3 defined attributes:
 - MethodName: Name of the Custom Method, used in SQF callExtension in place of the child method ```("CHILD:methodNameHere:param1:param2..")```
 - SqlString: SQL String with SQF-like format keys ```(select ObjectUID from object_data where ObjectID = '%1')```
 - ReturnTypes: Array of strings defining what types the call should return - this helps when returning SQF strings- example in "PreBuilt" folder provided in the download  
+
 If only a single value (IE only one Database column) is being read, EpochHive will return that single value as is like so ```["Pass",valuehere]```  
 If multiple values (IE more than one Database column) are being read, EpochHive will return them in an SQF array like so ```["Pass",[value1,value2,value3,...]]```  
-If Mulitple Database rows are being read, EpochHive will return a Multi-Dimensional SQF array like so ```["PASS",[[value1,value2],[value3,value4]]]```  
+If Mulitple Database rows are being read, EpochHive will return a Multi-Dimensional SQF array like so  
+```["PASS",[[value1,value2],[value3,value4]]]```  
 NOTE: As limited to by callExtension, EpochHive will only return as a STRING. You can parse an SQF array out of the return string:  
 ```
 _return = "EpochHive" callExtension "CHILD:childhere:param1..";
