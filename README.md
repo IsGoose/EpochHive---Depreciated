@@ -30,14 +30,17 @@ Next, create a new file in your Server Config Directory called "hiveCfg.json"
 Add the following JSON text to the file:
 ```json
 {
-	"Host": "localhost",
-	"User": "root",
-	"Password": "",
-	"Schema": "dayz_epoch",
-	"Instance": 11,
-	"Time": "local",
-	"Hour": 11,
-	"LogLevel": "debug"
+	"Host":"localhost",
+	"Password":"",
+	"Schema":"dayz_epoch",
+	"User":"root",
+	"LogLevel":"debug",
+	"Time":"static",
+	"Hour":11,
+	"Instance":11,
+	"CustomMethods":
+	[
+	]
 }
 ```  
 
@@ -50,7 +53,23 @@ This is EpochHive's Config File - the file that EpochHive will read from when it
 - Time: Time Setting. "local" for Local Server System Time, "static" for Static Time as defined below
 - Hour: Hour to return if Time is set to "static" - not used if Time is set to "local"
 - LogLevel: If "debug", then EpochHive will log every action. if left emtpy ("")  EpochHive will only log Critical Errors
+- CustomMethods: This is where the user can define custom Methods for EpochHive to call. See Below on how to configure!
 
+### Configuring Custom Methods
+A custom method will have these 3 defined attributes:
+- MethodName: Name of the Custom Method, used in SQF callExtension in place of the child method ```("CHILD:methodNameHere:param1:param2..")```
+- SqlString: SQL String with SQF-like format keys ```(select ObjectUID from object_data where ObjectID = '%1')```
+- ReturnTypes: Array of strings defining what types the call should return - this helps when returning SQF strings- example in "PreBuilt" folder provided in the download  
+If only a single value (IE only one Database column) is being read, EpochHive will return that single value as is like so ```["Pass",valuehere]```  
+If multiple values (IE more than one Database column) are being read, EpochHive will return them in an SQF array like so ```["Pass",[value1,value2,value3,...]]```  
+If Mulitple Database rows are being read, EpochHive will return a Multi-Dimensional SQF array like so ```["PASS",[[value1,value2],[value3,value4]]]```  
+NOTE: As limited to by callExtension, EpochHive will only return as a STRING. You can parse an SQF array out of the return string:  
+```
+_return = "EpochHive" callExtension "CHILD:childhere:param1..";
+_array = call compile str formatText["%1", _return];
+```   
+Where ```_array``` is now your SQF array.
+  
 EpochHive will log to a file called "EpochHiveLOG.txt" located in your root Server Install Directory   
   
 ### Dependencies
