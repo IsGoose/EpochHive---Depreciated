@@ -10,8 +10,62 @@ namespace EpochHive
     {
         public static string ConnectionString { get; set; }
         public static MySqlConnection Connection { get; set; }
-        public static Config Cfg { get; set; }
 
+
+        public static HiveResult ExecuteCustomMethod(CustomHiveMethod method)
+        {
+            var result = new HiveResult();
+            //Format SQF Parameters into Sql String
+            for(int i = 0; i < method.Parameters.Length; i++)
+            {
+                string param = method.Parameters[i];
+                method.SqlString = method.SqlString.Replace($"%{i + 1}", param);
+            }
+
+            //Execute SQL Query as Reader incase we are returning DB Data
+            var reader = Database.ExecuteBasicRead(method.SqlString);
+
+            //Return empty SQF Array if nothing has been read
+            if (!reader.HasRows)
+            {
+                result.Success = true;
+                result.Result = "[]";
+                return result;
+            }
+
+            //Reader has rows to read
+            List<string> datas = new List<string>();
+            int rows = 0;
+            while(reader.Read())
+            {
+                var data = new List<string>();
+                rows++;
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    string type = method.ReturnTypes[i];
+                    if (type == "string")
+                        data.Add("\"" + reader.GetValue(i).ToString() + "\""); //Return as a string (needs to be surrounded in " " for SQF to parse as a string
+                    else
+                        data.Add(reader.GetValue(i).ToString()); //Return normally (SQF can parse out array and scalar)
+                }
+
+                //Return single value from row if we have only selected 1 value
+                if (data.Count == 1)
+                    datas.Add(data[0]);
+                //Return multiple values from row if we have read multiple values
+                else 
+                    datas.Add("[" + string.Join(",", data) + "]");
+            }
+            //Return Single SQF array if only 1 row has been read
+            if (datas.Count == 1)
+                result.Result = datas[0];
+            //Return Mulit-Dim. SQF array if >1 row has been read
+            else
+                result.Result = "[" + string.Join(",", datas) + "]";
+            result.Success = true;
+            return result;
+
+        }
 
         /// <summary>
         /// Carries out simple SQL Read to determine if a player is new to Database or not
@@ -222,7 +276,7 @@ namespace EpochHive
                 string serverKey = reader["serverKey"].ToString();
                 string objectUID = reader["ObjUID"].ToString();
                 reader.Close();
-                var pubresult = Database.PublishObject(Cfg.Instance.ToString(),classname,damage,charid,worldspace,inv,hitpoints,fuel,uid);
+                var pubresult = Database.PublishObject(Entry.Config.Instance.ToString(),classname,damage,charid,worldspace,inv,hitpoints,fuel,uid);
                 if(pubresult.Success == false)
                 {
                     res.Success = false;
@@ -391,7 +445,7 @@ namespace EpochHive
                     reader.Close();
                 string medical = "[]";
                 ExecuteNoReturn("INSERT INTO `Character_DATA` (`PlayerUID`, `InstanceID`, `Worldspace`, `Inventory`, `Backpack`, `Medical`, `Generation`, `Datestamp`, `LastLogin`, `LastAte`, `LastDrank`, `Humanity`) values " +
-                $"('{uid}','{Cfg.Instance}', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
+                $"('{uid}','{Entry.Config.Instance}', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
                 reader = ExecuteBasicRead($"select CharacterID from Character_DATA where PlayerUID = \"{uid}\" and Alive = '1';");
                 if (reader.HasRows && reader.Read())
                 {
@@ -517,7 +571,7 @@ namespace EpochHive
                     reader.Close();
                 string medical = "[]";
                 ExecuteNoReturn("INSERT INTO `Character_DATA` (`PlayerUID`, `InstanceID`, `Worldspace`, `Inventory`, `Backpack`, `Medical`, `Generation`, `Datestamp`, `LastLogin`, `LastAte`, `LastDrank`, `Humanity`) values " +
-                $"('{uid}','{Cfg.Instance}', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
+                $"('{uid}','{Entry.Config.Instance}', '{worldspace}', '{inventory}', '{backpack}', '{medical}', '{gen}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{humanity}');");
                 reader = ExecuteBasicRead($"select CharacterID from Character_DATA where PlayerUID = \"{uid}\" and Alive = '1';");
                 if (reader.HasRows && reader.Read())
                 {
@@ -780,18 +834,17 @@ namespace EpochHive
             }
             return result;
         }
-        public static HiveResult Connect(Config cfg)
+        public static HiveResult Connect()
         {
             var result = new HiveResult();
             try
             {
-                string conn = $"Server={cfg.Host};Database={cfg.Schema};Uid={cfg.User};Pwd={cfg.Password};";
+                string conn = $"Server={Entry.Config.Host};Database={Entry.Config.Schema};Uid={Entry.Config.User};Pwd={Entry.Config.Password};";
                 Connection = new MySqlConnection(conn);
                 Connection.Open();
                 if (Connection.Ping())
                 {
                     ConnectionString = conn;
-                    Cfg = cfg;
                     result.Success = true;
                     return result;
                 }

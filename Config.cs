@@ -19,14 +19,13 @@ namespace EpochHive
         public string Time { get; set; }
         public int Hour { get; set; }
         public int Instance { get; set; }
+        public List<CustomHiveMethod> CustomMethods { get; set; }
         public Config()
         {
 
         }
         public static Config Load()
         {
-
-            Config cfgx = new Config();
             try
             {
                 var serverProcess = Process.GetProcessesByName("arma2oaserver");
@@ -48,9 +47,8 @@ namespace EpochHive
 
                     
             }
-            catch (Exception e)
+            catch
             {
-               // File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", e.Message);
             }
             return null;
         }

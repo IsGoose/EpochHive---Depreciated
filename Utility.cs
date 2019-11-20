@@ -46,10 +46,23 @@ namespace EpochHive
                 case "801": result = Database.GetVehicleForSpawn(args[1], args[2], args[3]); break;
                 case "802": result = Database.StoreVehicle(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]); break;
                 case "803": result = Database.MaintainVehicles(args[1]); break;
+
+                //Fallback to default if no "official" Hive Method found - try and detect custom method
+                default :
+                    {
+                        //Use LINQ to select our custom method
+                        var method = Entry.Config.CustomMethods.Where(cm => cm.MethodName == child).FirstOrDefault();
+                        if(method == null)
+                            return result;
+                        //Assign method parameters
+                        method.Parameters = args.GetRangeAfter(0);
+                        //Execute
+                        result = Database.ExecuteCustomMethod(method);
+                        break;
+                    }
             }
             return result;
         }
-
     }
     public static class Extensions
     {

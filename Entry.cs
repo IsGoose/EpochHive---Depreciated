@@ -21,9 +21,9 @@ namespace EpochHive
             
             var result = RunHive(sqfParams);
             output.Append(result.Result);
-            }catch(Exception e)
+            }catch
             {
-              //  File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "errorLog.txt", $"{e.Message}\n[{string.Join(",",sqfParams)}]");
+ 
             }
         }
         public static HiveResult RunHive(string[] p)
@@ -33,7 +33,7 @@ namespace EpochHive
             var hiveResult = new HiveResult() { Result = "[\"FAIL\"]" };
             if (Config != null)
             {
-                var result = Database.Connect(Config);
+                var result = Database.Connect();
                 if (!result.Success)
                 {
                     Logger.Severity = "CRITICAL";
@@ -57,6 +57,18 @@ namespace EpochHive
                     return hiveResult;
                 }
 
+                if(p[0] != "CHILD")
+                {
+                    Logger.Severity = "CRITICAL";
+                    Logger.LogText = "First Parameter must be \"CHILD\"";
+                    Logger.ErrorMessage = null;
+                    Logger.Params.AddRange(p);
+                    Logger.Log();
+                    hiveResult.Success = false;
+                    hiveResult.Result = "[\"FAIL\"]";
+                    return hiveResult;
+                }
+
                 string child = p[1];
                 HiveResult res = Utility.DelegateMethod(child, p.GetRangeAfter(0));
                 Database.Disconnect();
@@ -66,8 +78,6 @@ namespace EpochHive
                         res.Result = "[\"PASS\"]";
                     else
                         res.Result = "[\"PASS\"," + res.Result + "]";
-                    //TODO return result
-                    Console.WriteLine(res.Result);
                     if (Config.LogLevel.ToLower() == "debug")
                     {
                         Logger.Severity = "DEBUG";
