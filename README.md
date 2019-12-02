@@ -3,8 +3,8 @@ Epoch Hive for Epoch 1.0.7
 
 *Supporting by Default:*
 - [Epoch](https://epochmod.com/a2dayzepoch.php)
-- [Multicharacter](https://epochmod.com/forum/topic/4944-release-multiple-character-support-now-compatible-with-epoch-1051/)
-- [VirtualGarage](https://github.com/oiad/virtualGarage)
+- [Multicharacter](https://epochmod.com/forum/topic/4944-release-multiple-character-support-now-compatible-with-epoch-1051/) - 	NOT TESTED
+- [VirtualGarage](https://github.com/oiad/virtualGarage) - NOT TESTED
 
 Epoch Hive was built upon the .NET Framework (ver. 4.7.2)
 
